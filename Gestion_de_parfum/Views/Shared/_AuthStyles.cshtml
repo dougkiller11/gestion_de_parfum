@@ -1,0 +1,195 @@
+<style>
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #121218;
+        padding: 20px;
+    }
+
+    .login-wrapper {
+        width: 100%;
+        max-width: 440px;
+    }
+
+    .login-card {
+        background-color: #1E1F2A;
+        backdrop-filter: blur(8px);
+        border-radius: 18px;
+        padding: 36px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+
+    .perfume-icon {
+        font-size: 56px;
+        margin-bottom: 10px;
+        animation: float 3s ease-in-out infinite;
+        filter: drop-shadow(0 6px 10px rgba(0,0,0,0.35));
+    }
+
+    @@keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .login-header h1 {
+        color: #F5F5F5;
+        letter-spacing: 0.5px;
+        font-size: 28px;
+        font-weight: 800;
+        margin: 6px 0 4px 0;
+        text-transform: uppercase;
+    }
+
+    .subtitle {
+        color: #A0A3B1;
+        font-size: 13px;
+        margin-top: 2px;
+    }
+
+    .alert-error {
+        background: rgba(182, 38, 46, 0.12);
+        border: 1px solid rgba(182, 38, 46, 0.35);
+        border-radius: 12px;
+        padding: 10px 12px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #ff6b6b;
+        font-size: 13px;
+    }
+
+    .error-icon {
+        font-size: 18px;
+    }
+
+    .login-form {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-label {
+        color: #F5F5F5;
+        font-weight: 600;
+        font-size: 13px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
+    .label-icon {
+        font-size: 16px;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid #2A2B38;
+        border-radius: 12px;
+        font-size: 15px;
+        transition: all 0.25s ease;
+        background-color: #1E1F2A;
+        color: #F5F5F5;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #C59D5F;
+        box-shadow: 0 0 0 3px rgba(197, 157, 95, 0.3);
+    }
+
+    .form-input::placeholder {
+        color: #A0A3B1;
+    }
+
+    .validation-message {
+        color: #ff7b7b;
+        font-size: 12px;
+        margin-top: 6px;
+    }
+
+    .login-button {
+        width: 100%;
+        padding: 14px 16px;
+        background-color: #C59D5F;
+        color: #121218;
+        border: 1px solid #C59D5F;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 750;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 6px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .login-button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+        filter: brightness(1.05);
+    }
+
+    .login-button:active:not(:disabled) {
+        transform: translateY(0);
+    }
+
+    .login-button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .register-link {
+        margin-top: 16px;
+        font-size: 13px;
+        color: #c0c0c0;
+        text-align: center;
+    }
+
+    .register-link a {
+        color: #C59D5F;
+        text-decoration: none;
+        font-weight: 600;
+        margin-left: 4px;
+    }
+
+    .register-link a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+

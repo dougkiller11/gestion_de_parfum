@@ -1,0 +1,408 @@
+@page "/inscription"
+@attribute [AllowAnonymous]
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using System.Security.Claims
+
+<PageTitle>Inscription - Gestion de Parfum</PageTitle>
+
+<div class="login-container">
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="perfume-icon">🧴</div>
+                <h1>Créer un compte</h1>
+                <p class="subtitle">Rejoignez la plateforme de gestion de parfums</p>
+            </div>
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert-error">
+                    <span class="error-icon">⚠️</span>
+                    <span>@errorMessage</span>
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(successMessage))
+            {
+                <div class="alert-success">
+                    <span class="success-icon">✔</span>
+                    <span>@successMessage</span>
+                </div>
+            }
+
+            <EditForm Model="registerModel" OnValidSubmit="HandleRegisterAsync" class="login-form">
+                <DataAnnotationsValidator />
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">👤</span>
+                        Nom complet
+                    </label>
+                    <InputText class="form-input" placeholder="Entrez votre nom" @bind-Value="registerModel.Nom" />
+                    <ValidationMessage For="@(() => registerModel.Nom)" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">📧</span>
+                        Email
+                    </label>
+                    <InputText class="form-input" placeholder="Entrez votre email" @bind-Value="registerModel.Email" />
+                    <ValidationMessage For="@(() => registerModel.Email)" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">🔒</span>
+                        Mot de passe
+                    </label>
+                    <InputText type="password" class="form-input" placeholder="Choisissez un mot de passe" @bind-Value="registerModel.Password" />
+                    <ValidationMessage For="@(() => registerModel.Password)" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">🔒</span>
+                        Confirmer le mot de passe
+                    </label>
+                    <InputText type="password" class="form-input" placeholder="Répétez le mot de passe" @bind-Value="registerModel.ConfirmPassword" />
+                    <ValidationMessage For="@(() => registerModel.ConfirmPassword)" />
+                </div>
+
+                <button class="login-button" type="submit" disabled="@isSubmitting">
+                    @if (isSubmitting)
+                    {
+                        <span class="spinner"></span>
+                        <span>Inscription en cours...</span>
+                    }
+                    else
+                    {
+                        <span>Créer mon compte</span>
+                    }
+                </button>
+            </EditForm>
+
+            <div class="register-link">
+                <span>Déjà un compte ?</span>
+                <a href="login">Se connecter</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* On réutilise les mêmes styles que Login.razor *@
+
+<style>
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #121218;
+        padding: 20px;
+    }
+
+    .login-wrapper {
+        width: 100%;
+        max-width: 440px;
+    }
+
+    .login-card {
+        background-color: #1E1F2A;
+        backdrop-filter: blur(8px);
+        border-radius: 18px;
+        padding: 36px;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 35px;
+    }
+
+    .perfume-icon {
+        font-size: 56px;
+        margin-bottom: 10px;
+        animation: float 3s ease-in-out infinite;
+        filter: drop-shadow(0 6px 10px rgba(0,0,0,0.35));
+    }
+
+    @@keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .login-header h1 {
+        color: #F5F5F5;
+        letter-spacing: 0.5px;
+        font-size: 28px;
+        font-weight: 800;
+        margin: 6px 0 4px 0;
+        text-transform: uppercase;
+    }
+
+    .subtitle {
+        color: #A0A3B1;
+        font-size: 13px;
+        margin-top: 2px;
+    }
+
+    .alert-error {
+        background: rgba(182, 38, 46, 0.12);
+        border: 1px solid rgba(182, 38, 46, 0.35);
+        border-radius: 12px;
+        padding: 10px 12px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #ff6b6b;
+        font-size: 13px;
+    }
+
+    .error-icon {
+        font-size: 18px;
+    }
+
+    .alert-success {
+        background: rgba(46, 204, 113, 0.12);
+        border: 1px solid rgba(46, 204, 113, 0.4);
+        border-radius: 12px;
+        padding: 10px 12px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #2ecc71;
+        font-size: 13px;
+    }
+
+    .success-icon {
+        font-size: 18px;
+    }
+
+    .login-form {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-label {
+        color: #F5F5F5;
+        font-weight: 600;
+        font-size: 13px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
+    .label-icon {
+        font-size: 16px;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid #2A2B38;
+        border-radius: 12px;
+        font-size: 15px;
+        transition: all 0.25s ease;
+        background-color: #1E1F2A;
+        color: #F5F5F5;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #C59D5F;
+        box-shadow: 0 0 0 3px rgba(197, 157, 95, 0.3);
+    }
+
+    .form-input::placeholder {
+        color: #A0A3B1;
+    }
+
+    .login-button {
+        width: 100%;
+        padding: 14px 16px;
+        background-color: #C59D5F;
+        color: #121218;
+        border: 1px solid #C59D5F;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 750;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 6px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .login-button:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+        filter: brightness(1.05);
+    }
+
+    .login-button:active:not(:disabled) {
+        transform: translateY(0);
+    }
+
+    .login-button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .spinner {
+        width: 18px;
+        height: 18px;
+        border: 2px solid rgba(18, 18, 24, 0.25);
+        border-top-color: #121218;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .validation-message {
+        color: #ff7b7b;
+        font-size: 12px;
+        margin-top: 6px;
+    }
+
+    .register-link {
+        margin-top: 16px;
+        font-size: 13px;
+        color: #c0c0c0;
+        text-align: center;
+    }
+
+    .register-link a {
+        color: #C59D5F;
+        text-decoration: none;
+        font-weight: 600;
+        margin-left: 4px;
+    }
+
+    .register-link a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+@code {
+    private RegisterModel registerModel = new();
+    private bool isSubmitting;
+    private string? errorMessage;
+    private string? successMessage;
+
+    [Inject] private ApplicationDbContext Db { get; set; } = default!;
+    [Inject] private NavigationManager Nav { get; set; } = default!;
+    [Inject] private IHttpContextAccessor HttpContextAccessor { get; set; } = default!;
+
+    private async Task HandleRegisterAsync()
+    {
+        isSubmitting = true;
+        errorMessage = null;
+        successMessage = null;
+
+        try
+        {
+            // Vérifier si l'email est déjà utilisé
+            var existing = Db.Utilisateurs.FirstOrDefault(u => u.Email == registerModel.Email);
+            if (existing != null)
+            {
+                errorMessage = "Un compte existe déjà avec cet email.";
+                return;
+            }
+
+            // Créer l'utilisateur (mot de passe en clair pour l'instant, à améliorer plus tard)
+            var utilisateur = new Utilisateur
+            {
+                Nom = registerModel.Nom,
+                Email = registerModel.Email,
+                MotDePasse = registerModel.Password
+            };
+
+            Db.Utilisateurs.Add(utilisateur);
+            await Db.SaveChangesAsync();
+
+            // Connecter automatiquement l'utilisateur après inscription
+            var claims = new List<Claim>
+            {
+                new(ClaimTypes.NameIdentifier, utilisateur.Id.ToString()),
+                new(ClaimTypes.Name, utilisateur.Nom),
+                new(ClaimTypes.Email, utilisateur.Email)
+            };
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+
+            await HttpContextAccessor.HttpContext!.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                principal,
+                new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8)
+                });
+
+            // Redirige vers l'accueil
+            Nav.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Erreur lors de l'inscription : {ex.Message}";
+        }
+        finally
+        {
+            isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+
+    private class RegisterModel
+    {
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Le nom est obligatoire.")]
+        public string Nom { get; set; } = string.Empty;
+
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "L'email est obligatoire.")]
+        [System.ComponentModel.DataAnnotations.EmailAddress(ErrorMessage = "Email invalide.")]
+        public string Email { get; set; } = string.Empty;
+
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Le mot de passe est obligatoire.")]
+        [System.ComponentModel.DataAnnotations.MinLength(6, ErrorMessage = "Minimum 6 caractères.")]
+        public string Password { get; set; } = string.Empty;
+
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "La confirmation est obligatoire.")]
+        [System.ComponentModel.DataAnnotations.Compare(nameof(Password), ErrorMessage = "Les mots de passe ne correspondent pas.")]
+        public string ConfirmPassword { get; set; } = string.Empty;
+    }
+}

@@ -1,0 +1,61 @@
+@model Gestion_de_parfum.Models.LoginViewModel
+
+@{
+    ViewData["Title"] = "Connexion";
+}
+
+<div class="login-container">
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="perfume-icon">🧴</div>
+                <h1>Gestion de Parfum</h1>
+                <p class="subtitle">Connexion</p>
+            </div>
+
+            @if (ViewData.ModelState.ErrorCount > 0)
+            {
+                <div class="alert-error">
+                    <span class="error-icon">⚠️</span>
+                    <span>Vérifiez vos informations de connexion.</span>
+                </div>
+            }
+
+            <form asp-action="Login" method="post" class="login-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="ReturnUrl" />
+
+                <div class="form-group">
+                    <label class="form-label" asp-for="Email">
+                        <span class="label-icon">📧</span>
+                        Email
+                    </label>
+                    <input class="form-input" asp-for="Email" placeholder="Entrez votre email" />
+                    <span class="validation-message" asp-validation-for="Email"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" asp-for="Password">
+                        <span class="label-icon">🔒</span>
+                        Mot de passe
+                    </label>
+                    <input class="form-input" asp-for="Password" placeholder="Entrez votre mot de passe" />
+                    <span class="validation-message" asp-validation-for="Password"></span>
+                </div>
+
+                <button class="login-button" type="submit">
+                    <span>Se connecter</span>
+                </button>
+            </form>
+
+            <div class="register-link">
+                <span>Pas encore de compte ?</span>
+                <a asp-action="Register">Créer un compte</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<partial name="_AuthStyles" />
+
+
