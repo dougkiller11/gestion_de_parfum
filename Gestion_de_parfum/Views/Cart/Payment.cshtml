@@ -1,0 +1,168 @@
+@model List<Gestion_de_parfum.Controllers.CartItem>
+@{
+    ViewData["Title"] = "Paiement sécurisé";
+    Layout = null;
+    var total = ViewBag.Total ?? 0d;
+}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Essence Luxe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family:'Inter',sans-serif; background:#050505; color:white; margin:0; }
+        .wrap { max-width: 760px; margin:0 auto; padding:40px 20px 60px; }
+        h1 { color:#d4af37; font-size:30px; margin:0 0 14px; }
+        .card { background: linear-gradient(180deg, rgba(12,12,12,0.92) 0%, rgba(6,6,6,0.95) 100%); border:1px solid rgba(212,175,55,0.22); border-radius:14px; padding:22px; box-shadow:0 14px 36px rgba(0,0,0,0.35); }
+        label { display:block; margin-top:14px; margin-bottom:6px; font-weight:600; color:#d4af37; }
+        input { width:100%; padding:12px; border-radius:10px; border:1px solid rgba(212,175,55,0.25); background:rgba(255,255,255,0.04); color:white; font-size:14px; }
+        .row { display:flex; gap:12px; flex-wrap:wrap; }
+        .btn { margin-top:18px; width:100%; padding:12px 16px; border-radius:10px; border:1px solid rgba(212,175,55,0.35); background:linear-gradient(135deg,#d4af37 0%,#b8860b 100%); color:#050505; font-weight:800; cursor:pointer; }
+        .summary { margin-top:20px; padding:14px; border:1px solid rgba(212,175,55,0.18); border-radius:12px; background:rgba(255,255,255,0.03); }
+        .back { color:rgba(255,255,255,0.7); text-decoration:none; font-size:13px; display:inline-block; margin-bottom:14px; }
+        .half { flex:1 1 200px; }
+        .third { flex:1 1 140px; }
+        .invalid { border-color:#f87171 !important; box-shadow:0 0 0 1px rgba(248,113,113,0.4); }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <a class="back" href="@Url.Action("Index","Cart")">← Retour panier</a>
+        <h1>Paiement sécurisé</h1>
+        <div class="card">
+            <div class="summary">
+                Montant à payer : <strong>@(((double)total).ToString("F2")) €</strong>
+            </div>
+            <form id="payForm" method="post" action="@Url.Action("Confirmation","Cart")">
+                <div class="row">
+                    <div class="half">
+                        <label>Adresse de livraison</label>
+                        <input id="addr1" name="addr1" type="text" placeholder="N°, rue" required />
+                    </div>
+                    <div class="half">
+                        <label>Complément / Ville</label>
+                        <input id="addr2" name="addr2" type="text" placeholder="Appartement, Bâtiment, Ville" required />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="third">
+                        <label>Code postal</label>
+                        <input id="postal" name="postal" type="text" inputmode="numeric" maxlength="10" placeholder="75000" required />
+                    </div>
+                    <div class="third">
+                        <label>Pays</label>
+                        <input id="country" name="country" type="text" placeholder="France" required />
+                    </div>
+                </div>
+
+                <label>Nom sur la carte</label>
+                <input id="cardName" name="cardName" type="text" placeholder="Nom et prénom" />
+                <label>Numéro de carte</label>
+                <input id="cardNumber" name="cardNumber" type="text" inputmode="numeric" placeholder="1234 5678 9012 3456" maxlength="19" />
+                <div class="row">
+                    <div style="flex:1;">
+                        <label>Expiration</label>
+                        <input id="expiry" name="expiry" type="text" inputmode="numeric" placeholder="MM/AA" maxlength="5" />
+                    </div>
+                    <div style="width:120px;">
+                        <label>CVV</label>
+                        <input id="cvv" name="cvv" type="text" inputmode="numeric" placeholder="123" maxlength="3" />
+                    </div>
+                </div>
+                <button id="payBtn" type="button" class="btn">Payer maintenant</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        const markInvalid = (el, condition) => {
+            if (!el) return false;
+            if (condition) { el.classList.add('invalid'); return true; }
+            el.classList.remove('invalid'); return false;
+        };
+
+        // Format carte: chiffres uniquement, groupe 4 par 4, max 16 chiffres -> 19 chars avec espaces
+        const cardInput = document.getElementById('cardNumber');
+        if (cardInput) {
+            cardInput.addEventListener('input', () => {
+                const digits = cardInput.value.replace(/\D/g, '').slice(0, 16);
+                const groups = digits.match(/.{1,4}/g) || [];
+                cardInput.value = groups.join(' ');
+            });
+        }
+
+        // Expiration MM/AA : chiffres uniquement, auto-insertion du /, bornage mois et année
+        const expiryInput = document.getElementById('expiry');
+        if (expiryInput) {
+            expiryInput.addEventListener('input', () => {
+                let digits = expiryInput.value.replace(/\D/g, '').slice(0, 4);
+                // borne mois à 12
+                if (digits.length >= 2) {
+                    const mm = parseInt(digits.slice(0, 2), 10);
+                    if (mm === 0) digits = '01' + digits.slice(2);
+                    else if (mm > 12) digits = '12' + digits.slice(2);
+                }
+                // borne année à l'année courante (AA)
+                if (digits.length === 4) {
+                    const currentYear2 = new Date().getFullYear() % 100;
+                    const yy = parseInt(digits.slice(2, 4), 10);
+                    if (yy < currentYear2) {
+                        digits = digits.slice(0, 2) + currentYear2.toString().padStart(2, '0');
+                    }
+                }
+                if (digits.length > 2) digits = digits.slice(0, 2) + '/' + digits.slice(2);
+                expiryInput.value = digits;
+            });
+        }
+
+        // CVV : chiffres uniquement, max 3
+        const cvvInput = document.getElementById('cvv');
+        if (cvvInput) {
+            cvvInput.addEventListener('input', () => {
+                cvvInput.value = cvvInput.value.replace(/\D/g, '').slice(0, 3);
+            });
+        }
+
+        // Validation avant paiement
+        const payBtn = document.getElementById('payBtn');
+        const payForm = document.getElementById('payForm');
+        if (payBtn) {
+            payBtn.addEventListener('click', () => {
+                const addr1 = document.getElementById('addr1');
+                const addr2 = document.getElementById('addr2');
+                const postal = document.getElementById('postal');
+                const country = document.getElementById('country');
+                const cardName = document.getElementById('cardName');
+
+                // Nettoyage préliminaire
+                [addr1, addr2, postal, country, cardName, cardInput, expiryInput, cvvInput].forEach(el => el?.classList.remove('invalid'));
+
+                let hasError = false;
+                hasError = markInvalid(addr1, !addr1.value.trim()) || hasError;
+                hasError = markInvalid(addr2, !addr2.value.trim()) || hasError;
+                hasError = markInvalid(postal, !postal.value.trim()) || hasError;
+                hasError = markInvalid(country, !country.value.trim()) || hasError;
+                hasError = markInvalid(cardName, !cardName.value.trim()) || hasError;
+
+                const cardOk = cardInput && cardInput.value.replace(/\D/g, '').length === 16;
+                hasError = markInvalid(cardInput, !cardOk) || hasError;
+
+                const expDigits = expiryInput ? expiryInput.value.replace('/', '') : '';
+                const expOk = expDigits.length === 4;
+                hasError = markInvalid(expiryInput, !expOk) || hasError;
+
+                const cvvOk = cvvInput && cvvInput.value.replace(/\D/g, '').length === 3;
+                hasError = markInvalid(cvvInput, !cvvOk) || hasError;
+
+                if (!hasError) {
+                    // Soumission réelle vers la page de confirmation
+                    if (payForm) payForm.submit();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+

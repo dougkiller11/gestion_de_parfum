@@ -1,0 +1,46 @@
+@model Gestion_de_parfum.Models.Parfum
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <title>Admin - Supprimer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body{font-family:'Inter',sans-serif;background:#050505;color:white;margin:0;}
+        .wrap{max-width:800px;margin:0 auto;padding:30px 20px 50px;}
+        h1{margin:0 0 16px;font-size:24px;font-weight:800;color:#d4af37;}
+        .card {background:rgba(12,12,12,0.92);border:1px solid rgba(212,175,55,0.2);border-radius:12px;padding:20px;box-shadow:0 12px 30px rgba(0,0,0,0.35);}
+        .row{margin-bottom:10px;font-size:14px;}
+        .label{color:#d4af37;font-weight:700;}
+        .actions{margin-top:16px;display:flex;gap:10px;}
+        .btn{padding:10px 14px;border-radius:10px;border:1px solid rgba(212,175,55,0.35);text-decoration:none;font-weight:700;font-size:13px;background:linear-gradient(135deg,#d4af37,#b8860b);color:#050505;cursor:pointer;}
+        .btn-secondary{background:rgba(255,255,255,0.08);color:white;}
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h1>Supprimer le produit</h1>
+    <div class="card">
+        <div class="row"><span class="label">Nom : </span>@Model.Nom</div>
+        <div class="row"><span class="label">Marque : </span>@(string.IsNullOrEmpty(Model.Marque) ? "Essence Luxe" : Model.Marque)</div>
+        <div class="row"><span class="label">Prix : </span>@Model.Prix.ToString("F2") €</div>
+        <div class="row"><span class="label">Stock : </span>@Model.Stock</div>
+        <div class="row"><span class="label">Catégorie : </span>@Model.Categorie?.Nom</div>
+        <div class="row"><span class="label">ImageUrl : </span>@Model.ImageUrl</div>
+        <div class="row"><span class="label">Description : </span>@Model.Description</div>
+        <div class="actions">
+            <form asp-action="Delete" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+                <button class="btn" type="submit">Confirmer</button>
+            </form>
+            <a class="btn btn-secondary" href="@Url.Action("Index")">Annuler</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+

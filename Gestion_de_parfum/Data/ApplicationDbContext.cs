@@ -71,7 +71,7 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(e => e.Categorie)
                 .WithMany(c => c.Parfums)
                 .HasForeignKey(e => e.CategorieId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         // Configuration de Panier
@@ -89,7 +89,7 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Commande>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Date).HasDefaultValueSql("datetime('now')");
+            entity.Property(e => e.Date).HasDefaultValueSql("GETDATE()");
             entity.Property(e => e.Statut).HasMaxLength(50);
             entity.HasOne(e => e.Client)
                 .WithMany(c => c.Commandes)

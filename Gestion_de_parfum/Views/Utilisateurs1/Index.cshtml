@@ -1,47 +1,39 @@
-﻿@model IEnumerable<Gestion_de_parfum.Models.Utilisateur>
-
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<Gestion_de_parfum.Models.Utilisateur>
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Utilisateurs";
+    ViewBag.HideNav = true;
 }
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Nom)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.MotDePasse)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nom)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MotDePasse)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="topbar" style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+    <h1 class="page-title">Utilisateurs</h1>
+    <div class="top-actions" style="display:flex;gap:10px;align-items:center;">
+        <a class="btn btn-secondary" style="background:rgba(255,255,255,0.08);color:white;border:1px solid rgba(212,175,55,0.25);" href="@Url.Action("Dashboard","AdminProducts")">Retour dashboard</a>
+        <a class="btn btn-gold" asp-action="Create" asp-controller="Utilisateurs1">Ajouter un utilisateur</a>
+    </div>
+</div>
+<div class="card">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Email</th>
+                <th style="width:160px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Nom</td>
+                    <td>@item.Email</td>
+                    <td class="actions">
+                        <a href="@Url.Action("Details", new { id = item.Id })">Détails</a>
+                        <a href="@Url.Action("Edit", new { id = item.Id })">Modifier</a>
+                        <a href="@Url.Action("Delete", new { id = item.Id })">Supprimer</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

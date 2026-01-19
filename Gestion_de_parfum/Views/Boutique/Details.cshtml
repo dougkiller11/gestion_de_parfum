@@ -1,0 +1,130 @@
+@model Gestion_de_parfum.Models.Parfum
+@{
+    ViewData["Title"] = Model.Nom;
+    Layout = null;
+    var image = string.IsNullOrEmpty(Model.ImageUrl)
+        ? "https://images.unsplash.com/photo-1506617420156-8e4536971650?auto=format&fit=crop&w=1200&q=80"
+        : Model.ImageUrl;
+    var previous = Context.Request.Headers["Referer"].FirstOrDefault() ?? Url.Action("Index","Boutique");
+    var highlights = new[] { Model.PointsFort1, Model.PointsFort2, Model.PointsFort3 }
+        .Where(h => !string.IsNullOrWhiteSpace(h))
+        .ToList();
+    var noteTete = !string.IsNullOrWhiteSpace(Model.NoteTete) ? Model.NoteTete : "Bergamote, agrumes";
+    var noteCoeur = !string.IsNullOrWhiteSpace(Model.NoteCoeur) ? Model.NoteCoeur : "Fleurs blanches, épices douces";
+    var noteFond = !string.IsNullOrWhiteSpace(Model.NoteFond) ? Model.NoteFond : "Ambre, bois précieux, musc";
+}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Essence Luxe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family:'Inter',sans-serif; margin:0; background:#050505; color:white; }
+        .wrap { max-width: 1200px; margin:0 auto; padding:40px 20px 60px; }
+        .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+        .brand { display:flex; align-items:center; gap:10px; }
+        .logo { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#d4af37,#b8860b); display:grid; place-items:center; font-weight:800; color:#050505; }
+        .name { font-weight:800; letter-spacing:2px; color:#d4af37; text-transform:uppercase; }
+        .back { color:rgba(255,255,255,0.7); text-decoration:none; font-size:13px; }
+        .card { display:grid; grid-template-columns: 1.05fr 0.95fr; gap:30px; background:linear-gradient(180deg,rgba(12,12,12,0.92) 0%, rgba(6,6,6,0.95) 100%); border:1px solid rgba(212,175,55,0.22); border-radius:18px; padding:26px; box-shadow:0 18px 42px rgba(0,0,0,0.38); }
+        .image { border-radius:16px; overflow:hidden; border:1px solid rgba(212,175,55,0.22); }
+        .image img { width:100%; height:100%; object-fit:cover; display:block; filter:saturate(1.05); }
+        h1 { margin:0 0 8px; font-size:30px; font-weight:800; letter-spacing:0.3px; }
+        .brand-line { color:rgba(212,175,55,0.9); font-size:13px; text-transform:uppercase; letter-spacing:1.2px; margin-bottom:14px; }
+        .price { font-size:26px; font-weight:800; color:#d4af37; margin:10px 0; }
+        .stock { font-size:13px; color:#4ade80; margin-bottom:12px; }
+        .stock.oos { color:#f87171; }
+        .desc { line-height:1.65; color:rgba(255,255,255,0.8); margin-bottom:18px; }
+        .meta { font-size:13px; color:rgba(255,255,255,0.62); margin-bottom:16px; }
+        .pill { display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:rgba(212,175,55,0.12); color:#d4af37; font-weight:700; font-size:12px; letter-spacing:0.5px; margin-right:8px; margin-bottom:8px; }
+        .highlights { display:grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin:16px 0 18px; }
+        .highlight { background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.15); border-radius:12px; padding:10px 12px; font-size:13px; color:rgba(255,255,255,0.78); }
+        .section-title { font-size:14px; font-weight:800; letter-spacing:1px; color:#d4af37; margin:18px 0 10px; text-transform:uppercase; }
+        .notes { display:grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap:10px; }
+        .note-box { background:rgba(255,255,255,0.02); border:1px solid rgba(212,175,55,0.15); border-radius:10px; padding:10px 12px; font-size:13px; color:rgba(255,255,255,0.8); }
+        .actions { display:flex; gap:10px; align-items:center; margin-top:16px; flex-wrap:wrap; }
+        .btn { padding:12px 16px; border-radius:10px; border:1px solid rgba(212,175,55,0.35); text-decoration:none; font-weight:700; font-size:13px; transition:all 0.2s ease; cursor:pointer; }
+        .btn-primary { background:linear-gradient(135deg,#d4af37 0%,#b8860b 100%); color:#050505; }
+        .btn-secondary { background:rgba(255,255,255,0.05); color:white; }
+        .btn:hover { transform:translateY(-1px); box-shadow:0 8px 18px rgba(212,175,55,0.25); }
+        @@media (max-width: 960px) { .card { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="header">
+            <div class="brand">
+                <div class="logo">★</div>
+                <div class="name">Essence Luxe</div>
+            </div>
+            <div>
+                <a class="back" href="@Url.Action("Index","Boutique")">← Retour boutique</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="image">
+                <img src="@image" alt="@Model.Nom" />
+            </div>
+            <div>
+                <div class="brand-line">@((Model.Marque ?? "Essence Luxe").ToUpper())</div>
+                <h1>@Model.Nom</h1>
+                <div class="price">@Model.Prix.ToString("F2") €</div>
+                <div class="stock @(Model.Stock <= 0 ? "oos" : "")">
+                    @(Model.Stock > 0 ? $"✓ En stock ({Model.Stock})" : "✗ Rupture de stock")
+                </div>
+                <div class="desc">
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        @Model.Description
+                    }
+                    else
+                    {
+                        <text>Parfum raffiné inspiré des maisons de haute parfumerie, avec une signature élégante.</text>
+                    }
+                </div>
+                <div class="meta">
+                    Catégorie : @(Model.Categorie?.Nom ?? "Non renseignée")
+                </div>
+                <div class="section-title">Points forts</div>
+                <div class="highlights">
+                    @if (highlights.Any())
+                    {
+                        foreach (var h in highlights)
+                        {
+                            <div class="highlight">@h</div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="highlight">Sillage élégant et longue tenue</div>
+                        <div class="highlight">Accords sophistiqués (floral, boisé, ambré)</div>
+                        <div class="highlight">Design premium, flacon inspiré haute parfumerie</div>
+                    }
+                </div>
+                <div class="section-title">Notes</div>
+                <div class="notes">
+                    <div class="note-box"><strong>Note de tête :</strong> @noteTete</div>
+                    <div class="note-box"><strong>Note de cœur :</strong> @noteCoeur</div>
+                    <div class="note-box"><strong>Note de fond :</strong> @noteFond</div>
+                </div>
+                <div class="actions">
+                    <form method="post" action="@Url.Action("Add","Cart")">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input type="hidden" name="qty" value="1" />
+                        <input type="hidden" name="returnUrl" value="@previous" />
+                        <button class="btn btn-primary" @(Model.Stock <= 0 ? "disabled" : "")>
+                            @(Model.Stock > 0 ? "Ajouter au panier" : "Indisponible")
+                        </button>
+                    </form>
+                    <a class="btn btn-secondary" href="@previous">Continuer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

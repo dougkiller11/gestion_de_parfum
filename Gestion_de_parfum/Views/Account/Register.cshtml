@@ -1,79 +1,732 @@
 @model Gestion_de_parfum.Models.RegisterViewModel
-
 @{
     ViewData["Title"] = "Inscription";
+    Layout = null;
 }
 
-<div class="login-container">
-    <div class="login-wrapper">
-        <div class="login-card">
-            <div class="login-header">
-                <div class="perfume-icon">🧴</div>
-                <h1>Créer un compte</h1>
-                <p class="subtitle">Inscrivez-vous pour accéder à la gestion de parfums</p>
-            </div>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Essence Luxe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-            @if (ViewData.ModelState.ErrorCount > 0)
+        body {
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* LEFT COLUMN - MARKETING SECTION */
+        .marketing-section {
+            flex: 1;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 50px 60px;
+            color: white;
+            overflow: hidden;
+        }
+
+        .marketing-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(212, 175, 55, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(184, 134, 11, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #d4af37, #b8860b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .brand-name {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #d4af37;
+            text-transform: uppercase;
+        }
+
+        .marketing-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .headline {
+            font-size: 42px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 24px;
+            color: white;
+        }
+
+        .description {
+            font-size: 15px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.85);
+            max-width: 500px;
+        }
+
+        .features {
+            display: flex;
+            gap: 16px;
+            margin-top: 50px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-box {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 0.5px solid rgba(212, 175, 55, 0.2);
+            border-radius: 10px;
+            padding: 24px 16px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-box:hover {
+            transform: translateY(-5px);
+            border-color: rgba(212, 175, 55, 0.4);
+        }
+
+        .feature-number {
+            font-size: 28px;
+            font-weight: 800;
+            color: #d4af37;
+            margin-bottom: 6px;
+        }
+
+        .feature-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        /* RIGHT COLUMN - REGISTER FORM */
+        .register-section {
+            flex: 1;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .register-section::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .register-section::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .register-section::-webkit-scrollbar-thumb {
+            background: #d4af37;
+            border-radius: 3px;
+        }
+
+        .register-container {
+            width: 100%;
+            max-width: 420px;
+            padding-top: 0;
+            margin: auto 0;
+        }
+
+        .register-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            margin-top: 0;
+        }
+
+        .register-subtitle {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 10px;
+            font-weight: 600;
+            color: #1a1a1a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .form-input-wrapper {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 0.5px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #1a1a1a;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
+
+        .form-input.input-validation-error,
+        .form-input.field-validation-error {
+            border-color: #ea4335;
+            border-width: 1px;
+        }
+
+        .form-group:has(.input-validation-error) .form-label,
+        .form-group:has(.field-validation-error) .form-label {
+            color: #ea4335;
+        }
+
+        /* Support pour les navigateurs qui ne supportent pas :has() */
+        .form-group.has-error .form-label {
+            color: #ea4335;
+        }
+
+        .form-group.has-error .form-input {
+            border-color: #ea4335;
+            border-width: 1px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+            font-size: 18px;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .password-toggle:hover {
+            color: #1a1a1a;
+        }
+
+        .validation-message {
+            color: #c33;
+            font-size: 10px;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .password-requirements {
+            margin-top: 8px;
+            padding: 12px;
+            background: #f8f8f8;
+            border-radius: 6px;
+            border: 0.5px solid #e0e0e0;
+        }
+
+        .password-requirements-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .requirement-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            margin-bottom: 6px;
+            transition: color 0.3s;
+        }
+
+        .requirement-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .requirement-icon {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            flex-shrink: 0;
+        }
+
+        .requirement-icon.valid {
+            background: #34a853;
+            color: white;
+        }
+
+        .requirement-icon.invalid {
+            background: #e0e0e0;
+            color: #999;
+        }
+
+        .requirement-text {
+            color: #666;
+        }
+
+        .requirement-item.valid .requirement-text {
+            color: #34a853;
+        }
+
+        .requirement-item.invalid .requirement-text {
+            color: #999;
+        }
+
+        .register-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-bottom: 25px;
+            margin-top: 8px;
+        }
+
+        .register-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 25px 0;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .separator::before,
+        .separator::after {
+            content: '';
+            flex: 1;
+            border-bottom: 0.5px solid #e0e0e0;
+        }
+
+        .separator span {
+            padding: 0 15px;
+        }
+
+        .social-register {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .social-button {
+            flex: 1;
+            padding: 10px;
+            border: 0.5px solid #e0e0e0;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1a1a1a;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+        }
+
+        .social-button:hover {
+            border-color: #d4af37;
+            background: #fafafa;
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+            background: conic-gradient(from 0deg, #ea4335, #fbbc05, #34a853, #4285f4, #ea4335);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .facebook-icon {
+            width: 20px;
+            height: 20px;
+            background: #1877f2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .login-link {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-top: 20px;
+        }
+
+        .login-link a {
+            color: #1a1a1a;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .validation-summary {
+            background: #fee;
+            border: 0.5px solid #fcc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 18px;
+            color: #c33;
+            font-size: 12px;
+        }
+
+        @@media (max-width: 968px) {
+            body {
+                flex-direction: column;
+            }
+
+            .marketing-section {
+                min-height: 40vh;
+                padding: 40px;
+            }
+
+            .headline {
+                font-size: 28px;
+            }
+
+            .features {
+                margin-top: 30px;
+            }
+
+            .register-section {
+                padding: 30px 20px;
+                align-items: flex-start;
+            }
+
+            .register-container {
+                padding-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- LEFT COLUMN - MARKETING -->
+    <div class="marketing-section">
+        <div class="brand-logo">
+            <div class="logo-icon">★</div>
+            <div class="brand-name">ESSENCE LUXE</div>
+        </div>
+        
+        <div class="marketing-content">
+            <h1 class="headline">
+                Rejoignez Notre<br />Communauté
+            </h1>
+            <p class="description">
+                Créez votre compte et découvrez une collection exclusive de parfums d'exception. Accédez à des offres spéciales et suivez vos commandes en temps réel.
+            </p>
+        </div>
+
+        <div class="features">
+            <div class="feature-box">
+                <div class="feature-number">100%</div>
+                <div class="feature-label">Authentique</div>
+            </div>
+            <div class="feature-box">
+                <div class="feature-number">500+</div>
+                <div class="feature-label">Fragrances</div>
+            </div>
+            <div class="feature-box">
+                <div class="feature-number">24h</div>
+                <div class="feature-label">Livraison</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT COLUMN - REGISTER FORM -->
+    <div class="register-section">
+        <div class="register-container">
+            <h1 class="register-title">Créer un compte</h1>
+            <p class="register-subtitle">Rejoignez Essence Luxe dès aujourd'hui</p>
+
+            @if (!ViewData.ModelState.IsValid)
             {
-                <div class="alert-error">
-                    <span class="error-icon">⚠️</span>
-                    <span>Certains champs sont invalides. Merci de vérifier.</span>
+                <div class="validation-summary">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <div>@error.ErrorMessage</div>
+                    }
                 </div>
             }
 
-            <form asp-action="Register" method="post" class="login-form">
+            <form asp-controller="Account" asp-action="Register" method="post">
                 @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="ReturnUrl" />
 
                 <div class="form-group">
-                    <label class="form-label" asp-for="Nom">
-                        <span class="label-icon">👤</span>
-                        Nom complet
-                    </label>
-                    <input class="form-input" asp-for="Nom" placeholder="Votre nom complet" />
-                    <span class="validation-message" asp-validation-for="Nom"></span>
+                    <label class="form-label" for="Nom">Nom complet</label>
+                    <input class="form-input" asp-for="Nom" name="Nom" id="Nom" placeholder="Votre nom complet" required />
+                    <span asp-validation-for="Nom" class="validation-message"></span>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" asp-for="Email">
-                        <span class="label-icon">📧</span>
-                        Email
-                    </label>
-                    <input class="form-input" asp-for="Email" placeholder="Votre email" />
-                    <span class="validation-message" asp-validation-for="Email"></span>
+                    <label class="form-label" for="Email">Adresse Email</label>
+                    <input class="form-input" asp-for="Email" name="Email" id="Email" type="email" placeholder="votre@email.com" required />
+                    <span asp-validation-for="Email" class="validation-message"></span>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" asp-for="Password">
-                        <span class="label-icon">🔒</span>
-                        Mot de passe
-                    </label>
-                    <input class="form-input" asp-for="Password" placeholder="Choisissez un mot de passe" />
-                    <span class="validation-message" asp-validation-for="Password"></span>
+                    <label class="form-label" for="Password">Mot de passe</label>
+                    <div class="form-input-wrapper">
+                        <input class="form-input" asp-for="Password" name="Password" type="password" id="passwordInput" placeholder="********" onkeyup="validatePassword()" required />
+                        <button type="button" class="password-toggle" onclick="togglePassword('passwordInput', 'eyeIcon1')">
+                            <span id="eyeIcon1">👁️</span>
+                        </button>
+                    </div>
+                    <div class="password-requirements" id="passwordRequirements">
+                        <div class="password-requirements-title">Conditions du mot de passe :</div>
+                        <div class="requirement-item" id="req-length">
+                            <div class="requirement-icon invalid">✗</div>
+                            <span class="requirement-text">Au moins 6 caractères</span>
+                        </div>
+                        <div class="requirement-item" id="req-uppercase">
+                            <div class="requirement-icon invalid">✗</div>
+                            <span class="requirement-text">Au moins une majuscule</span>
+                        </div>
+                        <div class="requirement-item" id="req-number">
+                            <div class="requirement-icon invalid">✗</div>
+                            <span class="requirement-text">Au moins un chiffre</span>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Password" class="validation-message"></span>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" asp-for="ConfirmPassword">
-                        <span class="label-icon">🔒</span>
-                        Confirmer le mot de passe
-                    </label>
-                    <input class="form-input" asp-for="ConfirmPassword" placeholder="Répétez le mot de passe" />
-                    <span class="validation-message" asp-validation-for="ConfirmPassword"></span>
+                    <label class="form-label" for="ConfirmPassword">Confirmer le mot de passe</label>
+                    <div class="form-input-wrapper">
+                        <input class="form-input" asp-for="ConfirmPassword" name="ConfirmPassword" type="password" id="confirmPasswordInput" placeholder="********" onkeyup="validatePasswordMatch()" required />
+                        <button type="button" class="password-toggle" onclick="togglePassword('confirmPasswordInput', 'eyeIcon2')">
+                            <span id="eyeIcon2">👁️</span>
+                        </button>
+                    </div>
+                    <div class="password-requirements" id="confirmPasswordRequirements" style="display: none;">
+                        <div class="requirement-item" id="req-match">
+                            <div class="requirement-icon invalid">✗</div>
+                            <span class="requirement-text">Les mots de passe correspondent</span>
+                        </div>
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="validation-message"></span>
                 </div>
 
-                <button class="login-button" type="submit">
-                    <span>Créer mon compte</span>
-                </button>
+                <button type="submit" class="register-button">Créer un compte</button>
             </form>
 
-            <div class="register-link">
-                <span>Déjà un compte ?</span>
-                <a asp-action="Login">Se connecter</a>
+            <div class="separator">
+                <span>ou</span>
+            </div>
+
+            <div class="social-register">
+                <button type="button" class="social-button">
+                    <div class="google-icon">G</div>
+                    <span>Google</span>
+                </button>
+                <button type="button" class="social-button">
+                    <div class="facebook-icon">f</div>
+                    <span>Facebook</span>
+                </button>
+            </div>
+
+            <div class="login-link">
+                Déjà un compte? <a href="@Url.Action("Login", "Account")">Se connecter</a>
             </div>
         </div>
     </div>
-</div>
 
-<partial name="_AuthStyles" />
+    <script>
+        // Ajouter les classes d'erreur aux champs avec erreurs de validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const formInputs = document.querySelectorAll('.form-input');
+            formInputs.forEach(input => {
+                const formGroup = input.closest('.form-group');
+                const validationMessage = formGroup.querySelector('.validation-message');
+                
+                // Vérifier si le champ a une erreur
+                if (input.classList.contains('input-validation-error') || 
+                    (validationMessage && validationMessage.textContent.trim() !== '')) {
+                    formGroup.classList.add('has-error');
+                }
+                
+                // Ajouter la classe d'erreur si le champ est vide après soumission
+                input.addEventListener('blur', function() {
+                    if (this.value.trim() === '' || this.classList.contains('input-validation-error')) {
+                        formGroup.classList.add('has-error');
+                    } else {
+                        formGroup.classList.remove('has-error');
+                    }
+                });
+                
+                // Retirer la classe d'erreur quand l'utilisateur tape
+                input.addEventListener('input', function() {
+                    if (this.value.trim() !== '' && !this.classList.contains('input-validation-error')) {
+                        formGroup.classList.remove('has-error');
+                    }
+                });
+            });
+        });
 
+        function togglePassword(inputId, iconId) {
+            const passwordInput = document.getElementById(inputId);
+            const eyeIcon = document.getElementById(iconId);
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.textContent = '👁️';
+            }
+        }
 
+        function validatePassword() {
+            const password = document.getElementById('passwordInput').value;
+            const reqLength = document.getElementById('req-length');
+            const reqUppercase = document.getElementById('req-uppercase');
+            const reqNumber = document.getElementById('req-number');
+            
+            // Fonction helper pour mettre à jour l'état d'une condition
+            function updateRequirement(element, isValid) {
+                if (isValid) {
+                    element.classList.add('valid');
+                    element.classList.remove('invalid');
+                    element.querySelector('.requirement-icon').textContent = '✓';
+                    element.querySelector('.requirement-icon').classList.add('valid');
+                    element.querySelector('.requirement-icon').classList.remove('invalid');
+                } else {
+                    element.classList.add('invalid');
+                    element.classList.remove('valid');
+                    element.querySelector('.requirement-icon').textContent = '✗';
+                    element.querySelector('.requirement-icon').classList.add('invalid');
+                    element.querySelector('.requirement-icon').classList.remove('valid');
+                }
+            }
+            
+            // Condition 1 : Au moins 6 caractères
+            updateRequirement(reqLength, password.length >= 6);
+            
+            // Condition 2 : Au moins une majuscule
+            updateRequirement(reqUppercase, /[A-Z]/.test(password));
+            
+            // Condition 3 : Au moins un chiffre
+            updateRequirement(reqNumber, /[0-9]/.test(password));
+
+            // Vérifier la correspondance si le champ de confirmation est rempli
+            validatePasswordMatch();
+        }
+
+        function validatePasswordMatch() {
+            const password = document.getElementById('passwordInput').value;
+            const confirmPassword = document.getElementById('confirmPasswordInput').value;
+            const confirmRequirements = document.getElementById('confirmPasswordRequirements');
+            const reqMatch = document.getElementById('req-match');
+            
+            if (confirmPassword.length > 0) {
+                confirmRequirements.style.display = 'block';
+                
+                if (password === confirmPassword && password.length > 0) {
+                    reqMatch.classList.add('valid');
+                    reqMatch.classList.remove('invalid');
+                    reqMatch.querySelector('.requirement-icon').textContent = '✓';
+                    reqMatch.querySelector('.requirement-icon').classList.add('valid');
+                    reqMatch.querySelector('.requirement-icon').classList.remove('invalid');
+                } else {
+                    reqMatch.classList.add('invalid');
+                    reqMatch.classList.remove('valid');
+                    reqMatch.querySelector('.requirement-icon').textContent = '✗';
+                    reqMatch.querySelector('.requirement-icon').classList.add('invalid');
+                    reqMatch.querySelector('.requirement-icon').classList.remove('valid');
+                }
+            } else {
+                confirmRequirements.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

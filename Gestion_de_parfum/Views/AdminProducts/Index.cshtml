@@ -1,0 +1,62 @@
+@model IEnumerable<Gestion_de_parfum.Models.Parfum>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <title>Admin - Produits</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body{font-family:'Inter',sans-serif;background:#050505;color:white;margin:0;}
+        .wrap{max-width:1200px;margin:0 auto;padding:30px 20px 50px;}
+        h1{margin:0 0 16px;font-size:26px;font-weight:800;color:#d4af37;}
+        .table{width:100%;border-collapse:collapse;background:rgba(12,12,12,0.9);border:1px solid rgba(212,175,55,0.18);border-radius:12px;overflow:hidden;}
+        .table th,.table td{padding:12px 14px;font-size:13px;border-bottom:1px solid rgba(212,175,55,0.12);}
+        .table th{color:#d4af37;text-align:left;}
+        .actions a{margin-right:8px;color:#d4af37;text-decoration:none;font-weight:700;}
+        .btn{display:inline-block;padding:10px 14px;border-radius:10px;border:1px solid rgba(212,175,55,0.35);text-decoration:none;font-weight:700;font-size:13px;background:linear-gradient(135deg,#d4af37,#b8860b);color:#050505;}
+        .btn-secondary{background:rgba(255,255,255,0.08);color:white;border:1px solid rgba(212,175,55,0.25);}
+        .btn-secondary:hover{transform:translateY(-1px);}
+        .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:12px;}
+        .topbar-actions{display:flex;gap:10px;align-items:center;}
+        .badge-success{color:#4ade80;margin-bottom:10px;}
+    </style>
+</head>
+<body>
+<div class="wrap">
+        <div class="topbar">
+        <h1>Produits</h1>
+        <div class="topbar-actions">
+            <a class="btn btn-secondary" href="@Url.Action("Dashboard","AdminProducts")">Retour dashboard</a>
+            <a class="btn" href="@Url.Action("Create")">Ajouter un produit</a>
+        </div>
+    </div>
+    @if (TempData["Success"] != null) { <div class="badge-success">@TempData["Success"]</div> }
+    <table class="table">
+        <thead><tr>
+            <th>Nom</th><th>Marque</th><th>Prix</th><th>Stock</th><th>Catégorie</th><th>Actions</th>
+        </tr></thead>
+        <tbody>
+        @foreach (var p in Model)
+        {
+            <tr>
+                <td>@p.Nom</td>
+                <td>@(string.IsNullOrEmpty(p.Marque) ? "Essence Luxe" : p.Marque)</td>
+                <td>@p.Prix.ToString("F2") €</td>
+                <td>@p.Stock</td>
+                <td>@p.Categorie?.Nom</td>
+                <td class="actions">
+                    <a href="@Url.Action("Details", new { id = p.Id })">Détails</a>
+                    <a href="@Url.Action("Edit", new { id = p.Id })">Modifier</a>
+                    <a href="@Url.Action("Delete", new { id = p.Id })">Supprimer</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
+

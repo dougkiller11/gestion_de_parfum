@@ -1,0 +1,363 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage{graphicx}
+\usepackage{placeins}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{pgfgantt}
+\usepackage{fancyhdr}
+\usepackage{enumitem}
+\geometry{left=3cm, right=2.5cm, top=3cm, bottom=3cm}
+\geometry{margin=2.5cm}
+
+\begin{document}
+
+%----------------------------------------------------------------------------------------
+%  PAGE DE GARDE
+%----------------------------------------------------------------------------------------
+\begin{titlepage}
+\begin{flushleft}
+    \includegraphics[width=4cm]{emsi_login_logo.png}
+\end{flushleft}
+
+\vspace{1cm}
+\begin{center}
+    {\LARGE \textbf{École Marocaine des Sciences de l'Ingénieur}}\\[0.3cm]
+    {\Large (EMSI)}\\[1.2cm]
+
+    {\Large \textbf{4\ieme{} Année Informatique et Réseaux}}\\[1.5cm]
+
+    \rule{\linewidth}{0.5mm}\\[0.4cm]
+    {\Huge \textbf{Gestion de Parfums}}\\[0.2cm]
+    {\Large \textbf{Plateforme e-commerce et back-office}}\\[0.4cm]
+    \rule{\linewidth}{0.5mm}\\[1.5cm]
+
+    {\Large Rapport de Projet}\\[2cm]
+
+    \begin{minipage}{0.45\textwidth}
+        \begin{flushleft}
+            \textbf{Réalisé par :}\\
+            Nawfel chorfi\\
+            Youness touil
+        \end{flushleft}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.45\textwidth}
+        \begin{flushright}
+            \textbf{Encadré par :}\\
+            M./Mme ................................
+        \end{flushright}
+    \end{minipage}
+
+    \vfill
+    {\Large Année universitaire : 2024 -- 2025}
+\end{center}
+\end{titlepage}
+
+%----------------------------------------------------------------------------------------
+\chapter*{Avant-propos}
+\addcontentsline{toc}{chapter}{Avant-propos}
+
+Ce rapport présente la conception et la réalisation d'une application web de
+\textbf{gestion de parfums} mêlant boutique en ligne et back-office de gestion.
+L'objectif est de proposer une plateforme fiable, sécurisée et maintenable,
+alignée sur les bonnes pratiques ASP.NET Core MVC et adaptée à un contexte
+professionnel.
+
+\vspace{0.4cm}
+\noindent\textbf{Noms et prénoms :}
+\begin{itemize}
+    \item Nawfel chorfi
+    \item Youness touil
+\end{itemize}
+
+\noindent\textbf{Projet :} Gestion de Parfums \\
+\textbf{Établissement :} École Marocaine des Sciences de l'Ingénieur -- Casablanca \\
+\textbf{Matière :} Développement .NET \\
+\textbf{Encadrant :} ................................
+
+%----------------------------------------------------------------------------------------
+\chapter*{Remerciements}
+\addcontentsline{toc}{chapter}{Remerciements}
+
+Je remercie toutes les personnes qui ont contribué au bon déroulement de ce
+projet : nos enseignants pour leurs conseils, nos proches pour leur soutien et
+les membres de l'équipe pédagogique pour le cadre d'apprentissage fourni.
+
+%----------------------------------------------------------------------------------------
+\chapter*{Résumé}
+\addcontentsline{toc}{chapter}{Résumé}
+
+Le projet \textbf{Gestion de Parfums} est une application web développée en
+\textbf{ASP.NET Core MVC (C\#)}. Elle combine une boutique en ligne pour la vente
+de parfums et un back-office de gestion. Les principales fonctionnalités sont :
+la navigation par catégories, la recherche et le filtrage, le panier d'achat,
+le paiement simulé, l'historique des commandes, ainsi qu'un espace
+d'administration pour gérer le catalogue, les stocks et suivre les ventes.
+
+La sécurité repose sur l'authentification par cookies, la gestion de rôles
+(\textit{Admin} / \textit{Client}), la validation côté serveur et la protection
+CSRF. Les données sont stockées dans \textbf{SQL Server} via
+\textbf{Entity Framework Core}. La configuration et l'initialisation (catégories
+et parfums de démonstration) sont centralisées dans \texttt{Program.cs}.
+
+%----------------------------------------------------------------------------------------
+\chapter*{Introduction générale}
+\addcontentsline{toc}{chapter}{Introduction générale}
+
+La digitalisation du commerce impose des plateformes fiables et sécurisées,
+capables de gérer le catalogue, les stocks et les commandes en temps réel.
+Le projet \textbf{Gestion de Parfums} répond à ce besoin en proposant une
+application web centrée sur l'expérience utilisateur (boutique) et la maîtrise
+opérationnelle (back-office). Il s'appuie sur ASP.NET Core MVC pour la structure,
+SQL Server pour la persistance et des contrôles d'accès adaptés aux profils
+administrateur et client.
+
+Les objectifs principaux sont :
+\begin{itemize}
+    \item Offrir une navigation claire par catégories et fiches produit détaillées.
+    \item Permettre l'ajout au panier, le paiement simulé et l'historisation des commandes.
+    \item Fournir aux administrateurs un tableau de bord, le CRUD du catalogue et le suivi des stocks.
+    \item Garantir la sécurité applicative (authentification, rôles, CSRF, validation).
+\end{itemize}
+
+%----------------------------------------------------------------------------------------
+\tableofcontents
+\listoffigures
+\setcounter{chapter}{0}
+
+%========================================================================================
+\chapter{Contexte général du projet}
+
+\section{Présentation de l'environnement de travail}
+Le projet est développé sous \textbf{ASP.NET Core 8 MVC} avec Razor Pages, EF Core
+et SQL Server. L'interface consomme des vues Razor, Bootstrap pour le design et
+utilise jQuery pour certaines interactions (formulaires, validation côté client).
+La configuration est centralisée dans \texttt{appsettings.json} et
+\texttt{Program.cs}, incluant la connexion SQL et l'initialisation des données
+(catégories et parfums de démonstration).
+
+\subsection{Service visé}
+L'application couvre le parcours complet d'un acheteur de parfums :
+\begin{itemize}
+    \item Navigation et filtrage par catégories (\textit{Homme}, \textit{Femme}, \textit{Mixte}).
+    \item Consultation des fiches produit (description, prix, stock, visuel).
+    \item Ajout au panier, modification des quantités et choix de la taille.
+    \item Paiement simulé, confirmation et récapitulatif.
+    \item Historique des commandes pour le client, suivi global pour l'administrateur.
+\end{itemize}
+
+\subsection{Équipe}
+Le développement est assuré par une équipe \textbf{full-stack} maîtrisant :
+conception MVC, sécurisation des routes, intégration front, ORM EF Core et
+déploiement (Kestrel/IIS).
+
+\section{Contexte et problématique}
+Les parfumeries qui gèrent leurs ventes avec des tableurs ou des outils hétérogènes
+rencontrent des difficultés : erreurs de stock, absence de traçabilité, mises à
+jour manuelles et lenteur de traitement des commandes. L'enjeu est de disposer
+d'un \textbf{système intégré} combinant vitrine e-commerce et back-office fiable.
+
+\section{Besoins et périmètre}
+\textbf{Besoins fonctionnels} : navigation par catégories, recherche, panier,
+paiement simulé, historique des achats, tableau de bord admin, CRUD parfums,
+gestion des stocks, mise à jour des statuts de commande.
+
+\textbf{Besoins techniques} : ASP.NET Core MVC, EF Core, SQL Server, authentification
+cookies, rôles, protection CSRF, validation côté serveur et côté client, vues Razor
+responsives (Bootstrap).
+
+\textbf{Périmètre inclus} : gestion du catalogue, commandes en ligne, historique,
+back-office admin, données seedées pour démarrage rapide.
+
+\textbf{Hors périmètre} : passerelle de paiement réelle, application mobile native,
+multilingue et multi-devise, intégration ERP/CRM, reporting avancé PDF/Excel.
+
+\section{Étude et critique de l'existant}
+Les solutions artisanales (Excel, inventaires papier) manquent de fiabilité et de
+centralisation. Les outils obsolètes n'offrent ni API ni interface web moderne.
+Les limites observées : erreurs d'inventaire, absence d'alertes, pas d'historique
+exploitable et peu de sécurité sur les accès.
+
+\section{Objectifs généraux}
+\begin{itemize}
+    \item Assurer un \textbf{parcours e-commerce} fluide et responsive.
+    \item Maintenir une \textbf{cohérence stock / commandes} grâce au back-office.
+    \item Sécuriser l'accès par rôles (\textit{Admin} / \textit{Client}) et sessions.
+    \item Faciliter la maintenance via une architecture claire (MVC + services + EF Core).
+\end{itemize}
+
+\section{Contraintes techniques}
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|p{4cm}|p{10cm}|}
+\hline
+\textbf{Catégorie} & \textbf{Description} \\
+\hline
+Backend & ASP.NET Core MVC, C\#, contrôleurs dédiés (\texttt{Boutique}, \texttt{Cart}, \texttt{AdminProducts}, \texttt{Account}). \\
+\hline
+Base de données & SQL Server, \texttt{ApplicationDbContext} (EF Core) avec migrations. \\
+\hline
+Sécurité & Authentification par cookies, rôles admin/client, protection CSRF, validation des entrées. \\
+\hline
+Front & Vues Razor, Bootstrap 5, jQuery pour interactions et validation. \\
+\hline
+Services & Seed initial (catégories, parfums), session panier, mapping des entités. \\
+\hline
+Configuration & \texttt{appsettings.json}, \texttt{Program.cs} (auth, routes, session, seeding). \\
+\hline
+\end{tabular}
+\caption{Synthèse technologique du projet}
+\end{table}
+
+\section{Diagramme de Gantt}
+\begin{figure}[h]
+\centering
+\ganttset{
+    hgrid,
+    vgrid,
+    x unit=0.6cm,
+    y unit chart=0.5cm,
+    bar height=0.45,
+    group height=0.35,
+    title height=0.9,
+    milestone height=0.3,
+    link/.style={-latex}
+}
+\begin{ganttchart}[]{1}{12}
+\gantttitle{Janvier 2025}{12} \\
+\gantttitlelist{6,...,17}{1} \\
+
+% Semaine 1
+\ganttgroup{Semaine 1}{1}{5} \\
+\ganttbar[name=task1]{Prise en main code / env}{1}{1} \\
+\ganttbar[name=task2]{Revue besoins / périmètre}{1}{2} \\
+\ganttbar[name=task3]{Maquettes vues boutique}{2}{3} \\
+\ganttbar[name=task4]{CRUD Parfums + Catégories}{3}{5} \\
+
+% Semaine 2
+\ganttgroup{Semaine 2}{8}{12} \\
+\ganttbar[name=task5]{Panier + sessions}{8}{9} \\
+\ganttbar[name=task6]{Commande + paiement simulé}{9}{10} \\
+\ganttbar[name=task7]{Dashboard admin (stocks, ventes)}{10}{11} \\
+\ganttbar[name=task8]{Tests, démo, polissage UI}{11}{12} \\
+
+% Dépendances
+\ganttlink{task4}{task5}
+\ganttlink{task5}{task6}
+\ganttlink{task6}{task7}
+\ganttlink{task7}{task8}
+
+\end{ganttchart}
+\caption{Diagramme de Gantt -- Gestion de Parfums (2 semaines)}
+\end{figure}
+
+%========================================================================================
+\chapter{Analyse et conception}
+
+\section{Choix UML}
+UML est utilisé pour cadrer la structure et les interactions :
+\begin{itemize}
+    \item \textbf{Diagramme de classes} : Parfum, Categorie, Client, Commande, LigneCommande, Utilisateur.
+    \item \textbf{Cas d'utilisation} : navigation boutique, ajout au panier, paiement, suivi des commandes, gestion du catalogue par l'admin.
+    \item \textbf{Diagrammes de séquence} : parcours d'achat, enregistrement d'une commande et notification admin.
+\end{itemize}
+
+\section{Diagrammes}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=12cm]{uml_classes_parfum.png} % à remplacer
+    \caption{Diagramme de classes principal}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=12cm]{uml_usecase_parfum.png} % à remplacer
+    \caption{Cas d'utilisation clefs}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=12cm]{uml_sequence_checkout.png} % à remplacer
+    \caption{Séquence : ajout au panier et paiement}
+\end{figure}
+
+\section{Conclusion de conception}
+La modélisation UML a servi de support pour valider les responsabilités, limiter
+le couplage et préparer les contrôleurs et vues. Elle a réduit les risques
+d'incohérence entre parcours utilisateur et modèle de données.
+
+%========================================================================================
+\chapter{Réalisation}
+
+\section{Environnement de développement}
+\begin{itemize}
+    \item \textbf{Backend} : ASP.NET Core MVC, contrôleurs structurés, routes dédiées (\texttt{Boutique}, \texttt{Cart}, \texttt{AdminProducts}, \texttt{Account}).
+    \item \textbf{Données} : EF Core, SQL Server, seeding initial dans \texttt{Program.cs} pour disposer de catégories et parfums dès le premier lancement.
+    \item \textbf{Front} : Razor + Bootstrap 5, vues responsives, jQuery pour la validation et quelques interactions.
+    \item \textbf{Sécurité} : authentification cookie, rôles, validation antiforgery, vérification des sessions pour le panier.
+    \item \textbf{Configuration} : \texttt{appsettings.json}, injection de dépendances, middleware (static files, auth, session).
+\end{itemize}
+
+\section{Fonctionnalités principales}
+\subsection*{Boutique (publique)}
+\begin{itemize}
+    \item Liste des parfums avec filtres par catégorie et recherche.
+    \item Fiche détail (description, prix, visuel, stock).
+    \item Ajout rapide au panier avec gestion des quantités et taille par défaut.
+\end{itemize}
+
+\subsection*{Panier et commande}
+\begin{itemize}
+    \item Stockage panier en session, mise à jour des quantités, suppression, vidage.
+    \item Paiement simulé (saisie adresse et carte), récapitulatif masqué des numéros.
+    \item Création de la commande et des lignes en base, génération d'un identifiant type \texttt{CMD-000123}.
+    \item Historique des commandes pour l'utilisateur connecté ; suivi global pour l'admin.
+\end{itemize}
+
+\subsection*{Administration}
+\begin{itemize}
+    \item Tableau de bord synthétique (nombre de produits, catégories, stock global).
+    \item CRUD complet sur les parfums avec sélection de catégorie.
+    \item Suivi des commandes et mise à jour du statut (admin uniquement).
+\end{itemize}
+
+\subsection*{Authentification et rôles}
+\begin{itemize}
+    \item Inscription et connexion par email/mot de passe.
+    \item Rôle \textit{Admin} donnant accès au back-office et aux vues dédiées.
+    \item Sessions persistantes configurées via cookies sécurisés.
+\end{itemize}
+
+\section{Extraits notables}
+\begin{itemize}
+    \item \texttt{Program.cs} : configuration des services (auth cookie, session, EF Core, routes) et \textbf{seeding} des catégories/parfums pour démarrer avec des données.
+    \item \texttt{BoutiqueController} : navigation publique, filtrage par catégorie et recherche plein texte.
+    \item \texttt{CartController} : gestion du panier en session, paiement simulé, création des commandes et historisation.
+    \item \texttt{AdminProductsController} : sécurisation par rôle \textit{Admin}, dashboard et CRUD du catalogue.
+\end{itemize}
+
+\section{Conclusion de réalisation}
+L'implémentation suit le modèle MVC pour séparer présentation, logique métier et
+accès aux données. Les seeds facilitent la démonstration immédiate. La sécurité
+par cookies et rôles protège le back-office tandis que les protections CSRF et la
+validation côté serveur renforcent la robustesse de l'application.
+
+%========================================================================================
+\chapter*{Conclusion générale et perspectives}
+\addcontentsline{toc}{chapter}{Conclusion générale et perspectives}
+
+Le projet \textbf{Gestion de Parfums} fournit une base opérationnelle pour une
+parfumerie en ligne : catalogue, panier, commandes et administration des stocks.
+Les prochaines améliorations possibles sont :
+\begin{itemize}
+    \item Intégrer une passerelle de paiement réelle (Stripe, PayPal).
+    \item Ajouter des alertes de stock et un reporting exportable (PDF/Excel).
+    \item Ouvrir une API publique sécurisée pour une application mobile.
+    \item Internationaliser (langues, devises) et ajouter des recommandations produit.
+\end{itemize}
+
+\end{document}
+

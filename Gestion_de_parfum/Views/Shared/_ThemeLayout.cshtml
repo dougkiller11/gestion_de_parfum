@@ -1,0 +1,38 @@
+@{
+    var title = ViewData["Title"] ?? "Essence Luxe";
+}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@title - Essence Luxe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/theme.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="shell">
+        <header class="shell__top">
+            <div class="brand">
+                <div class="icon">★</div>
+                <span>Essence Luxe</span>
+            </div>
+            @if (!(ViewBag.HideNav ?? false))
+            {
+                <nav class="nav">
+                    <a href="@Url.Action("Index","Home")">Accueil</a>
+                    <a href="@Url.Action("Index","Boutique")">Boutique</a>
+                    <a href="@Url.Action("Index","AdminProducts")">Admin</a>
+                    <a href="@Url.Action("Index","Cart")">Panier</a>
+                    <a href="@Url.Action("Login","Account")">Connexion</a>
+                </nav>
+            }
+        </header>
+        <main class="shell__body">
+            @RenderBody()
+        </main>
+    </div>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
+

@@ -1,0 +1,546 @@
+@model List<Gestion_de_parfum.Models.Parfum>
+@{
+    ViewData["Title"] = "Accueil";
+    Layout = null;
+}
+
+@using System.Text.Json
+@functions {
+    public class CartItemSession { public int ParfumId { get; set; } public string Nom { get; set; } = string.Empty; public double Prix { get; set; } public int Quantite { get; set; } }
+}
+@{
+    var cartJson = Context.Session.GetString("cart");
+    var cartCount = 0;
+    if (!string.IsNullOrEmpty(cartJson))
+    {
+        try
+        {
+            var items = JsonSerializer.Deserialize<List<CartItemSession>>(cartJson) ?? new List<CartItemSession>();
+            cartCount = items.Sum(i => i.Quantite);
+        }
+        catch { cartCount = 0; }
+    }
+}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Essence Luxe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            color: white;
+            background: #050505;
+            overflow-x: hidden;
+        }
+
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background:
+                linear-gradient(135deg, rgba(5, 5, 5, 0.85), rgba(8, 8, 8, 0.9)),
+                url('https://images.unsplash.com/photo-1506617420156-8e4536971650?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+        }
+
+        .overlay-glow {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(212, 175, 55, 0.15), transparent 45%),
+                radial-gradient(circle at 80% 70%, rgba(184, 134, 11, 0.12), transparent 45%);
+            pointer-events: none;
+        }
+
+        .nav {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 28px 60px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #d4af37, #b8860b);
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #0b0b0b;
+            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+        }
+
+        .brand-name {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #d4af37;
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+        }
+
+        .cart-icon {
+            position: relative;
+            padding-right: 10px;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #d4af37;
+            color: #050505;
+            border-radius: 999px;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 800;
+            min-width: 20px;
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.3);
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.82);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: #d4af37;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -6px;
+            width: 0;
+            height: 2px;
+            background: #d4af37;
+            transition: width 0.25s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .cta-primary {
+            padding: 12px 18px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+            color: #0b0b0b;
+            font-weight: 700;
+            font-size: 13px;
+            text-decoration: none;
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.35);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .cta-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(212, 175, 55, 0.45);
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            align-items: center;
+            padding: 0 60px 80px;
+            gap: 40px;
+        }
+
+        .headline {
+            font-size: clamp(42px, 5vw, 60px);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+
+        .subtext {
+            max-width: 520px;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .cta-secondary {
+            padding: 12px 18px;
+            border-radius: 10px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            color: #d4af37;
+            font-weight: 700;
+            font-size: 13px;
+            text-decoration: none;
+            background: rgba(13, 13, 13, 0.6);
+            transition: all 0.2s ease;
+        }
+
+        .cta-secondary:hover {
+            border-color: #d4af37;
+            background: rgba(212, 175, 55, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .glass-card {
+            background: rgba(15, 15, 15, 0.75);
+            border: 1px solid rgba(212, 175, 55, 0.18);
+            border-radius: 16px;
+            padding: 22px;
+            max-width: 360px;
+            box-shadow: 0 18px 38px rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(8px);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #d4af37;
+            margin-bottom: 10px;
+        }
+
+        .card-text {
+            font-size: 13px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.78);
+            margin-bottom: 18px;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(212, 175, 55, 0.12);
+            color: #d4af37;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+        }
+
+        .scroll-indicator::after {
+            content: '';
+            width: 32px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .section {
+            background: linear-gradient(180deg, rgba(7,7,7,0.96) 0%, #050505 100%);
+            padding: 70px 60px 90px;
+            border-top: 1px solid rgba(212,175,55,0.15);
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .section-subtitle {
+            font-size: 15px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 32px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 22px;
+        }
+
+        .card-product {
+            background: linear-gradient(180deg, rgba(20,20,20,0.9) 0%, rgba(10,10,10,0.9) 100%);
+            border: 1px solid rgba(212, 175, 55, 0.18);
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 16px 32px rgba(0,0,0,0.35);
+            transition: all 0.25s ease;
+        }
+
+        .card-product:hover {
+            transform: translateY(-4px);
+            border-color: #d4af37;
+            box-shadow: 0 20px 40px rgba(212,175,55,0.16);
+        }
+
+        .card-product h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 6px;
+        }
+
+        .card-product .brand {
+            font-size: 12px;
+            color: rgba(212, 175, 55, 0.85);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .card-product p {
+            font-size: 13px;
+            color: rgba(255,255,255,0.72);
+            line-height: 1.5;
+            min-height: 40px;
+            margin-bottom: 12px;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            color: #d4af37;
+            font-weight: 800;
+            font-size: 16px;
+        }
+
+        .btn-buy {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(212,175,55,0.4);
+            background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+            color: #0b0b0b;
+            font-weight: 700;
+            font-size: 12px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-buy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(212,175,55,0.3);
+        }
+
+        .btn-disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.5);
+            border-color: rgba(255,255,255,0.1);
+        }
+
+        /* Footer */
+        .footer {
+            background: #040404;
+            border-top: 1px solid rgba(212,175,55,0.15);
+            padding: 50px 60px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+        }
+
+        .footer h4 {
+            color: #d4af37;
+            font-size: 14px;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .footer p, .footer a {
+            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+            line-height: 1.7;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: #d4af37;
+        }
+
+        .footer .brand-foot {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        @@media (max-width: 1024px) {
+            .nav { padding: 22px 24px; }
+            .content { grid-template-columns: 1fr; padding: 0 24px 60px; }
+            .glass-card { margin-top: 10px; }
+            .section { padding: 50px 24px 70px; }
+        }
+
+        @@media (max-width: 640px) {
+            .nav-links { display: none; }
+            .headline { font-size: 34px; }
+            .subtext { font-size: 14px; }
+            .cta-primary, .cta-secondary { width: 100%; text-align: center; }
+            .scroll-indicator { display: none; }
+            .section-title { font-size: 26px; }
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <div class="overlay-glow"></div>
+
+        <nav class="nav">
+            <div class="brand">
+                <div class="logo-icon">EL</div>
+                <div class="brand-name">Essence Luxe</div>
+            </div>
+            <div class="nav-links">
+                <a class="nav-link" href="@Url.Action("Index", "Boutique")">Boutique</a>
+                <a class="nav-link cart-icon" href="@Url.Action("Index", "Cart")">
+                    Panier
+                    <span class="cart-badge">@cartCount</span>
+                </a>
+                <a class="nav-link" href="@Url.Action("Login", "Account")">Connexion</a>
+                <a class="nav-link" href="@Url.Action("Register", "Account")">Inscription</a>
+            </div>
+            <a class="cta-primary" href="@Url.Action("Login", "Account")">Rejoindre</a>
+        </nav>
+
+        <div class="content">
+            <div>
+                <div class="pill">Fragrance Signature</div>
+                <h1 class="headline">Un parfum qui raconte votre histoire</h1>
+                <p class="subtext">
+                    Une collection raffinée où chaque note exprime l'élégance. Découvrez des fragrances
+                    imaginées pour éveiller émotions et souvenirs, avec un design premium aligné
+                    sur l'univers Essence Luxe.
+                </p>
+                <div class="cta-group">
+                    <a class="cta-primary" href="@Url.Action("Index", "Boutique")">Explorer la collection</a>
+                    <a class="cta-secondary" href="@Url.Action("Login", "Account")">Se connecter</a>
+                </div>
+            </div>
+
+                <div class="glass-card">
+                    <div class="card-title">Édition limitée</div>
+                    <div class="card-text">
+                        Des essences exclusives inspirées de maisons de haute parfumerie,
+                        entre élégance française et modernité. Conçues pour sublimer chaque instant.
+                    </div>
+                    <div class="pill">Collections · Luxe · Authentique</div>
+                </div>
+        </div>
+
+        <div class="scroll-indicator">Défiler</div>
+    </section>
+
+    <section class="section">
+        <h2 class="section-title">Sélection du moment</h2>
+        <p class="section-subtitle">Découvrez quelques créations issues de la base de données. Pour acheter, connectez-vous.</p>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="product-grid">
+                @foreach (var p in Model)
+                {
+                    <div class="card-product">
+                        <div class="brand">@(!string.IsNullOrEmpty(p.Marque) ? p.Marque : "Essence Luxe")</div>
+                        <h3>@p.Nom</h3>
+                        @if (!string.IsNullOrEmpty(p.Description))
+                        {
+                            <p>@p.Description</p>
+                        }
+                        else
+                        {
+                            <p>Parfum raffiné aux notes élégantes et modernes.</p>
+                        }
+                        <div class="card-footer">
+                            <div class="price">@p.Prix.ToString("F2") €</div>
+                            <a class="btn-buy @(p.Stock <= 0 ? "btn-disabled" : "")"
+                               href="@(User?.Identity?.IsAuthenticated == true ? Url.Action("Index", "Boutique") : Url.Action("Login", "Account"))">
+                                @(p.Stock > 0 ? "Acheter" : "Indisponible")
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p style="color: rgba(255,255,255,0.6);">Aucun parfum pour le moment. Rendez-vous dans la boutique.</p>
+        }
+    </section>
+
+    <footer class="footer">
+        <div class="brand-foot">
+            <div class="logo-icon">EL</div>
+            <div>
+                <div class="brand-name" style="font-size:16px;">Essence Luxe</div>
+                <p>Parfums signature, élégance et modernité.</p>
+            </div>
+        </div>
+        <div>
+            <h4>Navigation</h4>
+            <p><a href="@Url.Action("Index","Home")">Accueil</a></p>
+            <p><a href="@Url.Action("Index","Boutique")">Boutique</a></p>
+            <p><a href="@Url.Action("Register","Account")">Connexion / Inscription</a></p>
+        </div>
+        <div>
+            <h4>Contact</h4>
+            <p>support@essenceluxe.com</p>
+            <p>+33 1 23 45 67 89</p>
+            <p>Paris · Luxe · Fragrance</p>
+        </div>
+        <div>
+            <h4>Engagement</h4>
+            <p>Livraison soignée, retours faciles, sélection exclusive.</p>
+            <p>Notes olfactives raffinées, design premium.</p>
+        </div>
+    </footer>
+</body>
+</html>
+
